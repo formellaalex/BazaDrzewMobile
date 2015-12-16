@@ -1,0 +1,105 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:gravity="center_horizontal"
+    android:orientation="vertical" android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin" tools:context=".AddTreeActivity">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Dodaj drzewo"
+        android:id="@+id/dodaj_drzewo_txt"
+        android:layout_gravity="center_horizontal" />
+
+    <ScrollView android:id="@+id/login_form" android:layout_width="match_parent"
+        android:layout_height="600dp">
+
+        <LinearLayout android:id="@+id/email_login_form" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView android:id="@+id/nazwa_latin_txt" android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:hint="Nazwa polska" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/nazwa_polska_txt" android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1" android:singleLine="true"
+                    android:hint="Nazwa łacińska" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/opis_txt" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:hint="@string/opis_placeholder"
+                    android:imeOptions="actionUnspecified"
+                    android:maxLines="1" android:singleLine="true" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/data_dodania_txt" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:hint="@string/data_dodania_placeholder"
+                    android:imeActionId="@+id/login"
+                    android:imeOptions="actionUnspecified"
+                    android:maxLines="1" android:singleLine="true" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <LinearLayout android:id="@+id/lokaliz_layout" android:layout_height="wrap_content" android:baselineAligned="false" android:layout_width="match_parent">
+                    <Button android:id="@+id/lokaliz_btn" android:text="@string/zlokalizuj_mapa"
+                        style="?android:textAppearanceSmall"  android:layout_width="0dp"
+                        android:layout_weight="1" android:layout_height="wrap_content" ></Button>
+
+                    <Button android:id="@+id/wpisz_lokaliz_btn" android:text="@string/wpisz_recz" style="?android:textAppearanceSmall"  android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"></Button>
+                </LinearLayout>
+                <EditText android:id="@+id/lokaliz_txt" android:layout_width="16dp"
+                    android:layout_height="0dp" android:hint="@string/lokalizacja_placeholder"
+                    android:maxLines="1" android:singleLine="true"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+
+
+            <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText android:id="@+id/dodatkowa_lok_txt" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:hint="@string/dodatkowa_lok_placeholder"
+                    android:maxLines="1" android:singleLine="true" />
+
+            </android.support.design.widget.TextInputLayout>
+
+
+            <Button android:id="@+id/add_complete_tree_btn" style="?android:textAppearanceSmall"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="@string/dodaj_drzewo_text"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>

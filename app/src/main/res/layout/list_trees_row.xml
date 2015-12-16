@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout android:id="@+id/lokaliz_layout" android:layout_height="wrap_content" android:baselineAligned="false" android:layout_width="match_parent">
+            <TextView android:id="@+id/row_nazwa_polska_txt"
+                android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"></TextView>
+            <TextView android:id="@+id/row_nazwa_latin_txt"
+                android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"></TextView>
+            <TextView android:id="@+id/row_wojewodztwo_txt"
+                android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"></TextView>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
