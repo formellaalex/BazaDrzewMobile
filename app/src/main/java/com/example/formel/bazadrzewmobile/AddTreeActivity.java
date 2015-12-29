@@ -190,7 +190,7 @@ public class AddTreeActivity extends AppCompatActivity {
             if (HttpURLConnection.HTTP_OK == result) {
                 Toast.makeText(AddTreeActivity.this, "Dodano drzewo", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(AddTreeActivity.this, "Wystąpił błąd podczas dodawania drzewa. " + result.toString() + "  " + AuthenticationHelper.TOKEN, Toast.LENGTH_LONG).show();
+                Toast.makeText(AddTreeActivity.this, "Wystąpił błąd podczas dodawania drzewa. " + result.toString() + "  ", Toast.LENGTH_LONG).show();
 
             }
         }

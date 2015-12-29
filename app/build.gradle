@@ -26,6 +26,10 @@ android {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
     }
 
+    repositories {
+        mavenCentral()
+    }
+
 
 }
 
@@ -38,4 +42,5 @@ dependencies {
     compile 'com.google.android.gms:play-services-base:8.1.0'
     compile 'org.osmdroid:osmdroid-android:5.0.1@aar'
     compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'com.google.code.gson:gson:2.2.4'
 }
