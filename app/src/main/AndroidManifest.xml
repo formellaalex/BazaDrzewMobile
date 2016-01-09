@@ -21,13 +21,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity android:name=".LoginActivity" >
+
+        </activity>
+        <activity android:name=".AddTreeActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name=".AddTreeActivity" >
         </activity>
         <activity
             android:name=".RegisterActivity"
@@ -40,6 +41,7 @@
         <activity android:name=".activities.ListTreesActivity" >
         </activity>
         <activity android:name=".activities.TreeInfoActivity" >
+
         </activity>
     </application>
 

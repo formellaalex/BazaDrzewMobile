@@ -73,12 +73,19 @@
                         style="?android:textAppearanceSmall"  android:layout_width="0dp"
                         android:layout_weight="1" android:layout_height="wrap_content" ></Button>
 
-                    <Button android:id="@+id/wpisz_lokaliz_btn" android:text="@string/wpisz_recz" style="?android:textAppearanceSmall"  android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"></Button>
+                    <Button android:id="@+id/wpisz_lokaliz_btn" android:text="@string/geokodowanie"
+                        style="?android:textAppearanceSmall"  android:layout_width="0dp"
+                        android:layout_weight="1" android:layout_height="wrap_content" android:textSize="12dp"></Button>
+
+                    <Button android:id="@+id/aktualna_lokaliz_btn" android:text="@string/aktual_lok"
+                        style="?android:textAppearanceSmall"  android:layout_width="0dp"
+                        android:layout_weight="1" android:layout_height="wrap_content"></Button>
+
                 </LinearLayout>
-                <EditText android:id="@+id/lokaliz_txt" android:layout_width="16dp"
-                    android:layout_height="0dp" android:hint="@string/lokalizacja_placeholder"
+                <EditText android:id="@+id/lokaliz_txt" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:hint="@string/lokalizacja_placeholder"
                     android:maxLines="1" android:singleLine="true"
-                    android:visibility="gone" />
+                    android:enabled="false"/>
             </LinearLayout>
 
 

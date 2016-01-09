@@ -1,17 +1,27 @@
 package com.example.formel.bazadrzewmobile;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Point;
+import android.location.Location;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 
+import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.Projection;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.MinimapOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
+
+import java.util.Arrays;
 
 /**
  *
@@ -20,28 +30,25 @@ import org.osmdroid.views.overlay.MinimapOverlay;
  */
 public class OSMActivity extends Activity {
 
-    // ===========================================================
-    // Constants
-    // ===========================================================
+    private MapView mapView;
 
-    // ===========================================================
-    // Fields
-    // ===========================================================
+    private IMapController mapController;
 
-    private MapView mOsmv;
+    Location location;
 
-    // ===========================================================
-    // Constructors
-    // ===========================================================
-    /** Called when the activity is first created. */
+    Projection proj;
+    IGeoPoint tappedLocation;
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         final RelativeLayout rl = new RelativeLayout(this);
 
-        this.mOsmv = new MapView(this);
-        rl.addView(this.mOsmv, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,
+        this.mapView = new MapView(this);
+        proj = mapView.getProjection();
+        location = new Location("");
+        rl.addView(this.mapView, new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,
                 LayoutParams.FILL_PARENT));
 
 		/* ZoomControls */
@@ -60,7 +67,7 @@ public class OSMActivity extends Activity {
             ivZoomIn.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(final View v) {
-                    OSMActivity.this.mOsmv.getController().zoomIn();
+                    OSMActivity.this.mapView.getController().zoomIn();
                 }
             });
 
@@ -79,7 +86,7 @@ public class OSMActivity extends Activity {
             ivZoomOut.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(final View v) {
-                    OSMActivity.this.mOsmv.getController().zoomOut();
+                    OSMActivity.this.mapView.getController().zoomOut();
                 }
             });
         }
@@ -87,32 +94,77 @@ public class OSMActivity extends Activity {
 		/* MiniMap */
         {
             MinimapOverlay miniMapOverlay = new MinimapOverlay(this,
-                    mOsmv.getTileRequestCompleteHandler());
-            this.mOsmv.getOverlays().add(miniMapOverlay);
+                    mapView.getTileRequestCompleteHandler());
+            this.mapView.getOverlays().add(miniMapOverlay);
         }
 
         this.setContentView(rl);
 
-        // Default location and zoom level
-        IMapController mapController = mOsmv.getController();
-        mapController.setZoom(5);
-        GeoPoint startPoint = new GeoPoint(50.936255, 6.957779);
+        mapController = mapView.getController();
+        mapController.setZoom(8);
+        GeoPoint startPoint = new GeoPoint(getIntent().getDoubleExtra("LAT", 53.0),
+                getIntent().getDoubleExtra("LON", 19.0));
         mapController.setCenter(startPoint);
+        addMarker(true, getIntent().getDoubleExtra("LAT", 53.0), getIntent().getDoubleExtra("LON", 19.0));
+        location.setLatitude(getIntent().getDoubleExtra("LAT", 53.0));
+        location.setLongitude(getIntent().getDoubleExtra("LON", 19.0));
     }
 
-    // ===========================================================
-    // Getter & Setter
-    // ===========================================================
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
 
-    // ===========================================================
-    // Methods from SuperClass/Interfaces
-    // ===========================================================
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_UP:
+                int x = (int)event.getX();
+                int y = (int)event.getY();
+                addMarker(false,x,y);
+                break;
+        }
+        return super.onTouchEvent(event);
+    }
 
-    // ===========================================================
-    // Methods
-    // ===========================================================
+    private IGeoPoint geoPointFromScreenCoords(boolean ifStart, double x, double y, MapView vw){
+        if (x < 0 || y < 0 ){
+            return null; // coord out of bounds
+        }
+        // Get the top left GeoPoint
+        Projection projection = vw.getProjection();
+        GeoPoint geoPointTopLeft = (GeoPoint) projection.fromPixels(0, 0);
+        Point topLeftPoint = new Point();
+        // Get the top left Point (includes osmdroid offsets)
+        projection.toPixels(geoPointTopLeft, topLeftPoint);
+        // get the GeoPoint of any point on screen
+        if(ifStart){
+            return new GeoPoint(x,y);
+        }
+        GeoPoint rtnGeoPoint = (GeoPoint) projection.fromPixels((int)x, (int)y);
+        return rtnGeoPoint;
+    }
 
-    // ===========================================================
-    // Inner and Anonymous Classes
-    // ===========================================================
+    private void addMarker(boolean ifStart, double lat, double lon){
+        IGeoPoint loc = geoPointFromScreenCoords(ifStart,lat, lon, mapView);
+
+        OverlayItem overlayItem = new OverlayItem("Poland", "Poland", loc);
+        ItemizedIconOverlay<OverlayItem> anotherItemizedIconOverlay
+                = new ItemizedIconOverlay<OverlayItem>(
+                this, Arrays.asList(overlayItem), null);
+        mapView.getOverlays().clear();
+        mapView.getOverlays().add(anotherItemizedIconOverlay);
+        mapView.invalidate();
+    }
+
+    @Override
+    public void finish() {
+        mapView.getTileProvider().clearTileCache();
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("LAT", location.getLatitude());
+        returnIntent.putExtra("LON", location.getLongitude());
+        setResult(Activity.RESULT_OK, returnIntent);
+        super.finish();
+    }
+
+
+
+
+
 }

@@ -21,13 +21,14 @@
     <string name="nazwa_polska_placeholder">Nazwa polska</string>
     <string name="nazwa_latin_placeholder">Nazwa łacińska</string>
     <string name="opis_placeholder">Opis</string>
-    <string name="data_dodania_placeholder">Data dodania</string>
+    <string name="data_dodania_placeholder">Data dodania(RRRR/MM/DD)</string>
     <string name="title_activity_register">Register</string>
     <string name="register_txt">Zarejestruj</string>
-    <string name="lokalizacja_placeholder">Lokalizacja</string>
+    <string name="lokalizacja_placeholder">Lokalizacja(LAT, LON)</string>
     <string name="dodatkowa_lok_placeholder">Dodatkowa lokalizacja</string>
     <string name="dodaj_drzewo_text">Dodaj drzewo</string>
     <string name="zlokalizuj_mapa">Zlokalizuj na mapie</string>
-    <string name="wpisz_recz">Wpisz lokalizacje</string>
+    <string name="geokodowanie">Geokodowanie</string>
+    <string name="aktual_lok">Aktulna lokalizacja</string>
     <string name="offline">OFFLINE</string>
 </resources>

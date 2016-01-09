@@ -75,7 +75,21 @@
             <LinearLayout android:layout_height="wrap_content" android:baselineAligned="false" android:layout_width="match_parent">
                 <Button android:id="@+id/info_nawiguj"
                     android:layout_width="0dp" android:layout_weight="0.4" android:layout_height="match_parent" android:text="Nawiguj"></Button>
+                <Button android:id="@+id/info_show_pictures"
+                    android:layout_width="0dp" android:layout_weight="0.4" android:layout_height="match_parent" android:text="Pokaż zdjęcia"></Button>
             </LinearLayout>
         </LinearLayout>
+        <GridView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/trees_grid_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:numColumns="auto_fit"
+            android:columnWidth="90dp"
+            android:horizontalSpacing="10dp"
+            android:verticalSpacing="10dp"
+            android:gravity="center"
+            android:stretchMode="columnWidth" >
+
+        </GridView>
     </ScrollView>
 </LinearLayout>
