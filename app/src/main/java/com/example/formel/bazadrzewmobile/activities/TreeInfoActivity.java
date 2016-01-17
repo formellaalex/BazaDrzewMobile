@@ -5,38 +5,34 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.formel.bazadrzewmobile.R;
 import com.example.formel.bazadrzewmobile.adapters.TreePicturesAdapter;
+import com.example.formel.bazadrzewmobile.beans.PictureBean;
 import com.example.formel.bazadrzewmobile.beans.TreeListBean;
-import com.example.formel.bazadrzewmobile.helpers.AuthenticationHelper;
-import com.example.formel.bazadrzewmobile.helpers.HttpHelper;
 import com.example.formel.bazadrzewmobile.helpers.LocationHelper;
+import com.example.formel.bazadrzewmobile.helpers.MediaHelper;
+import com.example.formel.bazadrzewmobile.tasks.GetImagesFromUrlTask;
+import com.example.formel.bazadrzewmobile.tasks.GetPicturesListTask;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -62,6 +58,14 @@ public class TreeInfoActivity extends AppCompatActivity {
     TextView loginTxt;
     @Bind(R.id.trees_grid_view)
     GridView gridView;
+    @Bind(R.id.info_show_pictures)
+    Button infoShowPictures;
+    @Bind(R.id.info_is_pomnik_txt)
+    TextView ispomnikTxt;
+    @Bind(R.id.info_in_greenhouse_txt)
+    TextView inGreenhouseTxt;
+    @Bind(R.id.info_street_txt)
+    TextView streetTxt;
 
     TreeListBean treeInfo;
     Location location = null;
@@ -69,36 +73,92 @@ public class TreeInfoActivity extends AppCompatActivity {
     HttpURLConnection conn;
     ProgressDialog dialog;
 
+    GetPicturesListTask getPicturesTask;
+
+    GetImagesFromUrlTask getImagesFromUrlTask;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tree_info);
         ButterKnife.bind(this);
         treeInfo = new Gson().fromJson(getIntent().getStringExtra("tree"), TreeListBean.class);
-        nameLatinTxt.setText(treeInfo.getName_latin());
-        namePolishTxt.setText(treeInfo.getName_polish());
-        cityTxt.setText(treeInfo.getCity());
-        districtTxt.setText(treeInfo.getDistrictName());
-        descriptionTxt.setText(treeInfo.getDescription());
-        locationTxt.setText(treeInfo.getLocation());
-        loginTxt.setText(treeInfo.getLogin());
+        nameLatinTxt.setText(treeInfo.nameLatin);
+        namePolishTxt.setText(treeInfo.namePolish);
+        cityTxt.setText(treeInfo.city);
+        districtTxt.setText(treeInfo.districtName);
+        descriptionTxt.setText(treeInfo.description);
+        locationTxt.setText(treeInfo.location);
+        loginTxt.setText(treeInfo.login);
+        streetTxt.setText(treeInfo.street);
+        if(treeInfo.isPomnik == 0){
+            ispomnikTxt.setText("Nie");
+        }
+        else{
+            ispomnikTxt.setText("Tak");
+        }
 
+        if(treeInfo.inGreenhouse == 0){
+            inGreenhouseTxt.setText("Nie");
+        }
+        else{
+            inGreenhouseTxt.setText("tak");
+        }
+        getPicturesTask = new GetPicturesListTask(TreeInfoActivity.this,treeInfo.idtreeObjects);
+        getPicturesTask.setPicturesListDownloadListener(new GetPicturesListTask.PicturesListDownloadListener() {
+
+            @Override
+            public void onFinishedPictureDownload(List<PictureBean> bitmaps,final ProgressDialog dialog) {
+                if(!bitmaps.isEmpty()){
+                    getImagesFromUrlTask = new GetImagesFromUrlTask(bitmaps);
+                    getImagesFromUrlTask.setImagesFromUrlDownloadListener(new GetImagesFromUrlTask.ImagesFromUrlDownloadListener() {
+                        @Override
+                        public void onFinishedImagesDownload(List<Drawable> drawables) {
+                            gridView.setAdapter(new TreePicturesAdapter(TreeInfoActivity.this, drawables));
+                            if(dialog.isShowing()){
+                                dialog.dismiss();
+                            }
+                            gridView.setVisibility(View.VISIBLE);}
+                    });
+                    getImagesFromUrlTask.execute();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Brak zdjęć.", Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+        });
 
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         if (LocationHelper.checkLocationPermission(getApplicationContext())) {
             Toast.makeText(getApplicationContext(), "Nie masz dostępu do usługi lokalizacji.", Toast.LENGTH_SHORT).show();
         } else {
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000 * 5,
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000 * 2,
                     10, mLocationListener);
         }
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                BitmapDrawable item = (BitmapDrawable) parent.getItemAtPosition(position);
+                //Create intent
+                Intent intent = new Intent(TreeInfoActivity.this, ImageFullScreenActivity.class);
+                Bitmap bitmap = item.getBitmap();
+                Uri uri = MediaHelper.storeImageAndGetUri(TreeInfoActivity.this, bitmap);
+                intent.putExtra("uri", uri);
+                //Start details activity
+                startActivity(intent);
+            }
+        });
 
 
     }
 
+
     @OnClick(R.id.info_nawiguj)
     public void nawigujStart() {
-        if(!isNumeric(treeInfo.getLocationLatitude()) || !isNumeric(treeInfo.getLocationLongitude())){
+        if(!LocationHelper.isNumeric(treeInfo.locationLatitude) || !LocationHelper.isNumeric(treeInfo.locationLongitude)){
             Toast.makeText(getApplicationContext(), "Nieznana lokalizacja drzewa.", Toast.LENGTH_SHORT).show();
         }
         else{
@@ -123,17 +183,24 @@ public class TreeInfoActivity extends AppCompatActivity {
                 dialog.show();
             } else {
                 if(!LocationHelper.checkLocationPermission(getApplicationContext())){
-                    location = mLocationManager
-                            .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                            Uri.parse("http://maps.google.com/maps?saddr="+location.getLatitude() +
-                                    "," + location.getLongitude() + "&daddr="+treeInfo.getLocationLatitude()
-                                    +","+ treeInfo.getLocationLongitude()));
+                    if(null == location) {
+                        Toast.makeText(getApplicationContext(), "Poczekaj na pobranie Twojej lokalizacji", Toast.LENGTH_SHORT).show();
 
-                    startActivity(intent);
+                    }
+                    else{
+                        location = mLocationManager
+                                .getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                                Uri.parse("http://maps.google.com/maps?saddr="+location.getLatitude() +
+                                        "," + location.getLongitude() + "&daddr="+treeInfo.locationLatitude
+                                        +","+ treeInfo.locationLongitude));
+
+                        startActivity(intent);
+                    }
+
                 }
                 else{
-                    Toast.makeText(getApplicationContext(), "Coś poszło nie tak.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Coś poszło nie tak", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -142,25 +209,14 @@ public class TreeInfoActivity extends AppCompatActivity {
 
     }
 
-    @OnClick(R.id.show_trees_btn)
+    @OnClick(R.id.info_show_pictures)
     public void pokazZdjecia(){
-        GetPicturesTask gpt = new GetPicturesTask();
-        gpt.execute();
+        infoShowPictures.setEnabled(false);
+        getPicturesTask.execute();
     }
 
 
-    public static boolean isNumeric(String str)
-    {
-        try
-        {
-            double d = Double.parseDouble(str);
-        }
-        catch(NumberFormatException nfe)
-        {
-            return false;
-        }
-        return true;
-    }
+
 
     private final LocationListener mLocationListener = new LocationListener() {
 
@@ -186,78 +242,5 @@ public class TreeInfoActivity extends AppCompatActivity {
         }
     };
 
-    public class GetPicturesTask extends AsyncTask<Void, Void, String> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            dialog = new ProgressDialog(getApplicationContext());
-            dialog.setMessage("Proszę czekać...");
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.show();
-        }
-        @Override
-        protected String doInBackground(Void... params) {
-
-            try {
-                URL urlToRequest = new URL("http://www.reichel.pl/bdp/webapi/web/get_pictures/" + treeInfo.getDescription());
-                conn = (HttpURLConnection) urlToRequest.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setReadTimeout(15000);
-                conn.setConnectTimeout(1000);
-                conn.setRequestProperty("token", AuthenticationHelper.TOKEN);
-                conn.setRequestProperty("Content-length", "0");
-                conn.setUseCaches(false);
-                conn.setAllowUserInteraction(false);
-                conn.connect();
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(),"UTF-8"));
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line+"\n");
-                }
-                br.close();
-                conn.disconnect();
-                return sb.toString();
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return HttpHelper.EMPTY_RESPONSE;
-        }
-
-        @Override
-        protected void onPostExecute(String result){
-            Type jsonObjectColl = new TypeToken<List<String>>() {}.getType();
-            List<String> treePictureResult = new Gson().fromJson(result, jsonObjectColl);
-            if(treePictureResult.isEmpty()){
-                dialog.dismiss();
-                Toast.makeText(getApplicationContext(), "Brak zdjęć dla obiektu", Toast.LENGTH_SHORT).show();
-            }
-            else{
-                List<Bitmap> bitmaps = new ArrayList<Bitmap>();
-                for(String picture : treePictureResult){
-                    URL url = null;
-                    try {
-                        url = new URL("http://http://reichel.pl/bdp/" + picture);
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        bitmaps.add(BitmapFactory.decodeStream(url.openConnection().getInputStream()));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                gridView.setAdapter(new TreePicturesAdapter(TreeInfoActivity.this, bitmaps));
-                gridView.setVisibility(View.VISIBLE);
-                dialog.dismiss();
-            }
-
-        }
-    }
 
 }

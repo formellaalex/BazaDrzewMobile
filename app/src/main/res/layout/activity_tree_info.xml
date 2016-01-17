@@ -68,6 +68,12 @@
             </LinearLayout>
             <LinearLayout android:layout_height="wrap_content" android:baselineAligned="false" android:layout_width="match_parent">
                 <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="41dp"
+                    android:text="W rezerwacie"></TextView>
+                <TextView android:id="@+id/info_in_greenhouse_txt"
+                    android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"></TextView>
+            </LinearLayout>
+            <LinearLayout android:layout_height="wrap_content" android:baselineAligned="false" android:layout_width="match_parent">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="41dp"
                     android:text="Dodający"></TextView>
                 <TextView android:id="@+id/info_login_txt"
                     android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent"></TextView>
@@ -78,18 +84,20 @@
                 <Button android:id="@+id/info_show_pictures"
                     android:layout_width="0dp" android:layout_weight="0.4" android:layout_height="match_parent" android:text="Pokaż zdjęcia"></Button>
             </LinearLayout>
-        </LinearLayout>
-        <GridView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/trees_grid_view"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:numColumns="auto_fit"
-            android:columnWidth="90dp"
-            android:horizontalSpacing="10dp"
-            android:verticalSpacing="10dp"
-            android:gravity="center"
-            android:stretchMode="columnWidth" >
 
-        </GridView>
+            <GridView xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/trees_grid_view"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:numColumns="auto_fit"
+                android:columnWidth="150dp"
+                android:horizontalSpacing="10dp"
+                android:verticalSpacing="10dp"
+                android:gravity="center"
+                android:stretchMode="columnWidth" >
+
+            </GridView>
+        </LinearLayout>
     </ScrollView>
+
 </LinearLayout>

@@ -1,7 +1,7 @@
 package com.example.formel.bazadrzewmobile.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -17,10 +17,10 @@ public class TreePicturesAdapter extends BaseAdapter {
     private Context mContext;
 
     // Keep all Images in array
-    List<Bitmap> picturesList;
+    List<Drawable> picturesList;
 
     // Constructor
-    public TreePicturesAdapter(Context c, List<Bitmap> picturesList){
+    public TreePicturesAdapter(Context c, List<Drawable> picturesList){
         this.picturesList = picturesList;
         mContext = c;
     }
@@ -42,10 +42,11 @@ public class TreePicturesAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView = new ImageView(mContext);
-        imageView.setImageBitmap(picturesList.get(position));
+        final ImageView imageView = new ImageView(mContext);
+        imageView.setImageDrawable(picturesList.get(position));
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         imageView.setLayoutParams(new GridView.LayoutParams(70, 70));
+
         return imageView;
     }
 }

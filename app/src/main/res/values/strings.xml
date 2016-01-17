@@ -30,5 +30,6 @@
     <string name="zlokalizuj_mapa">Zlokalizuj na mapie</string>
     <string name="geokodowanie">Geokodowanie</string>
     <string name="aktual_lok">Aktulna lokalizacja</string>
+    <string name="dodaj_zdjecia">Dodaj zdjęcia</string>
     <string name="offline">OFFLINE</string>
 </resources>

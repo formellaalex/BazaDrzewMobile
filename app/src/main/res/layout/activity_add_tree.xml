@@ -16,7 +16,7 @@
         android:layout_gravity="center_horizontal" />
 
     <ScrollView android:id="@+id/login_form" android:layout_width="match_parent"
-        android:layout_height="600dp">
+        android:layout_height="wrap_content">
 
         <LinearLayout android:id="@+id/email_login_form" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:orientation="vertical">
@@ -28,17 +28,17 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:singleLine="true"
-                    android:hint="Nazwa polska" />
+                    android:hint="Nazwa łacińska" />
 
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <EditText android:id="@+id/nazwa_polska_txt" android:layout_width="match_parent"
+                <AutoCompleteTextView android:id="@+id/nazwa_polska_txt" android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:maxLines="1" android:singleLine="true"
-                    android:hint="Nazwa łacińska" />
+                    android:hint="Nazwa polska" />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -86,9 +86,20 @@
                     android:layout_height="wrap_content" android:hint="@string/lokalizacja_placeholder"
                     android:maxLines="1" android:singleLine="true"
                     android:enabled="false"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/miastoTxt"
+                    android:hint="Miasto" />
             </LinearLayout>
 
 
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/ulicaNumerTxt"
+                android:hint="Ulica i numer" />
 
             <android.support.design.widget.TextInputLayout android:layout_width="match_parent"
                 android:layout_height="wrap_content">
@@ -99,11 +110,29 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Czy jest pomnikiem przyrody?"
+                android:id="@+id/isPomnikChk"
+                android:checked="false" />
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Czy jest w rezerwacie?"
+                android:id="@+id/inGreenHouseChk"
+                android:checked="false" />
+
+            <Button android:id="@+id/add_tree_pictures_btn" style="?android:textAppearanceSmall"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" android:text="@string/dodaj_zdjecia"
+                android:textStyle="bold" />
 
             <Button android:id="@+id/add_complete_tree_btn" style="?android:textAppearanceSmall"
                 android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" android:text="@string/dodaj_drzewo_text"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:enabled="true" />
 
         </LinearLayout>
     </ScrollView>

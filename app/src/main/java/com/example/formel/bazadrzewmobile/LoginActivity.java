@@ -31,12 +31,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.PasswordAuthentication;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.Random;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -92,21 +95,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .addOnConnectionFailedListener(this)
                 .addApi(Auth.CREDENTIALS_API).build();
         mCredentialsClient.connect();
-
-/*
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
-            }
-        });
-*/
-
-
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -122,43 +110,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             }
         });
 
-        offlineBtn.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //offlineMode();
-                TestTokenTask ttt = new TestTokenTask();
-                ttt.execute();
-
-            }
-        });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
-
-    public class TestTokenTask extends AsyncTask<Void, Void, Integer> {
-
-
-        @Override
-        protected Integer doInBackground(Void... params) {
-            URL url = null;
-            try {
-                url = new URL("http://www.reichel.pl/bdp/webapi/web/check_user");
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setDoInput(true);
-                conn.setRequestMethod("GET");
-                conn.setRequestProperty("token","aj7aGH8ja");
-                System.out.println("Response : " + conn.getResponseCode());
-
-
-            } catch (IOException e) {
-                Log.e("Error", "Error when connecting to url. " + e.toString());
-//                Toast.makeText(getApplicationContext(), "Błąd podczas uwierzytelnienia.", Toast.LENGTH_SHORT).show();
-            }
-            return null;
-        }
-    }
-
     @Override
     public void onConnected(Bundle connectionHint) {
         // Connected to Google Play services!
@@ -199,13 +154,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             boolean cancel = false;
             View focusView = null;
 
-            // Check for a valid password, if the user entered one.
-            if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-                mPasswordView.setError(getString(R.string.error_invalid_password));
-                focusView = mPasswordView;
-                cancel = true;
-            }
-
             // Check for a valid email address.
             if (TextUtils.isEmpty(email)) {
                 mEmailView.setError(getString(R.string.error_field_required));
@@ -231,17 +179,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             offlineMode();
         }
     }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 2;
-    }
-
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private void showProgress(final boolean show) {
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
@@ -298,7 +235,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 conn = (HttpURLConnection) url.openConnection();
                 return conn.getResponseCode();
             } catch (IOException e) {
-                //return HttpsURLConnection.HTTP_UNAUTHORIZED;
                 Log.d("Connection error", e.toString());
 
             }
@@ -326,8 +262,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             showProgress(false);
 
             if (result == HttpsURLConnection.HTTP_UNAUTHORIZED) {
-                mPasswordView.setError(getString(R.string.error_invalid_password));
-                mEmailView.setError(getString(R.string.error_invalid_email));
+                Toast.makeText(LoginActivity.this, "Nieprawidłowy login lub hasło", Toast.LENGTH_SHORT).show();
             } else if(result == HttpsURLConnection.HTTP_OK) {
                 Intent mainActivity = new Intent(LoginActivity.this, MainActivity.class);
                 mainActivity.putExtra("LOGIN", mEmail);
@@ -367,13 +302,22 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 url = new URL("http://www.reichel.pl/bdp/webapi/web/check_user");
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setDoInput(true);
+                conn.setDoOutput(true);
                 conn.setRequestMethod("GET");
-                conn.setRequestProperty("token", Charset.forName("UTF-8").encode(token).toString());
+                JSONObject postContent = new JSONObject();
+                postContent.put("token", token);
+                //conn.setRequestProperty("token", token);
+                conn.connect();
+                BufferedOutputStream os = new BufferedOutputStream(conn.getOutputStream());
+                os.write(postContent.toString().getBytes());
+                os.flush();
                 return conn.getResponseCode();
 
             } catch (IOException e) {
                 Log.e("Error", "Error when connecting to url. " + e.toString());
 //                Toast.makeText(getApplicationContext(), "Błąd podczas uwierzytelnienia.", Toast.LENGTH_SHORT).show();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
 
@@ -429,7 +373,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                                 }
                             } else {
                                 // Request has no resolution
-                                Log.d("CREDENTIALS_SAVE", "FAILED JAK PIERUN");
+                                Log.d("CREDENTIALS_SAVE", "FAILED JAK PIERUN" + status.getStatusMessage());
                             }
                         }
                     }
@@ -450,13 +394,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                     @Override
                     public void onResult(CredentialRequestResult credentialRequestResult) {
                         if (credentialRequestResult.getStatus().isSuccess()) {
-                            // See "Handle successful credential requests"
-                            //onCredentialRetrieved(credentialRequestResult.getCredential());
                             Log.d("API RETRIEVE", "SUCCESS RETRIEVE");
 
                         } else {
-                            // See "Handle unsuccessful and incomplete credential requests"
-                            //resolveResult(credentialRequestResult.getStatus());
                            Log.d("API RETRIEVE", "FAILED RETRIEVE" + "  " + credentialRequestResult.getStatus());
 
                             try {
@@ -481,10 +421,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-            if (requestCode == 333) {
+            if (requestCode == READ_CREDENTIALS) {
                 if (resultCode == RESULT_OK) {
                     Credential credential = data.getParcelableExtra(Credential.EXTRA_KEY);
                     showProgress(true);
+                    Log.d("TOKEN AKTUALNY", credential.getName());
                     checkTokenTask = new CheckTokenTask(credential);
                     checkTokenTask.execute();
 

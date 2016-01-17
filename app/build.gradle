@@ -3,9 +3,11 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
+    useLibrary  'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "com.example.formel.bazadrzewmobile"
+        multiDexEnabled true
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
@@ -24,6 +26,9 @@ android {
 
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
     }
 
     repositories {
@@ -38,9 +43,14 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.0'
     compile 'com.android.support:design:23.1.0'
-    compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5.1'
     compile 'com.google.android.gms:play-services-base:8.1.0'
     compile 'org.osmdroid:osmdroid-android:5.0.1@aar'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.google.code.gson:gson:2.2.4'
+    compile ('org.apache.httpcomponents:httpmime:4.3'){
+        exclude group: 'org.apache.httpcomponents', module: 'httpclient'
+    }
+    compile 'org.apache.httpcomponents:httpcore:4.4.1'
+
+
 }

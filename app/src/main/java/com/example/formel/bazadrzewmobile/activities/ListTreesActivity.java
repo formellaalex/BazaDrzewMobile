@@ -1,5 +1,7 @@
 package com.example.formel.bazadrzewmobile.activities;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +29,7 @@ public class ListTreesActivity extends AppCompatActivity {
     HttpURLConnection conn;
     private final String EMPTY_STRING = "";
     ListView treeListListview;
+    ProgressDialog progressDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,16 +37,33 @@ public class ListTreesActivity extends AppCompatActivity {
         treeListListview = (ListView)findViewById(R.id.treeListListview);
 
 
-        GetTreesTask getTreesTask = new GetTreesTask();
+        GetTreesTask getTreesTask = new GetTreesTask(ListTreesActivity.this);
+
         getTreesTask.execute();
+
     }
 
     public class GetTreesTask extends AsyncTask<Void, Void, String> {
+
+        Context ctx;
+
+        public GetTreesTask(Context ctx){
+            this.ctx = ctx;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(ctx);
+            progressDialog.setMessage("Pobieranie...");
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
+        }
 
         @Override
         protected String doInBackground(Void... params) {
 
             try {
+                progressDialog.show();
                 URL urlToRequest = new URL("http://www.reichel.pl/bdp/webapi/web/get_trees");
                 conn = (HttpURLConnection) urlToRequest.openConnection();
                 conn.setRequestMethod("GET");
@@ -83,6 +103,7 @@ public class ListTreesActivity extends AppCompatActivity {
                 List<TreeListBean> treeListResult = new Gson().fromJson(result, jsonObjectColl);
                 TreeListRowAdapter tlrw = new TreeListRowAdapter(ListTreesActivity.this, R.layout.list_trees_row, treeListResult);
                 treeListListview.setAdapter(tlrw);
+                progressDialog.dismiss();
 
 
             }

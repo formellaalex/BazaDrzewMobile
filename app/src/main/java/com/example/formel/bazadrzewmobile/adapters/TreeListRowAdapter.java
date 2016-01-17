@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.TextView;
 
 import com.example.formel.bazadrzewmobile.R;
@@ -15,6 +16,7 @@ import com.example.formel.bazadrzewmobile.activities.TreeInfoActivity;
 import com.example.formel.bazadrzewmobile.beans.TreeListBean;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,12 +26,14 @@ public class TreeListRowAdapter extends ArrayAdapter<TreeListBean> {
     Context context;
     int layoutResourceId;
     List<TreeListBean> data = null;
+    List<TreeListBean> filteredData = null;
 
     public TreeListRowAdapter(Context context, int layoutResourceId, List<TreeListBean> data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.data = data;
+        this.filteredData = data;
     }
 
     @Override
@@ -67,7 +71,7 @@ public class TreeListRowAdapter extends ArrayAdapter<TreeListBean> {
             }
         });
 
-        TreeListBean object = data.get(position);
+        TreeListBean object =filteredData.get(position);
         holder.namePolishTxt.setText(object.namePolish);
         holder.nameLatinTxt.setText(object.nameLatin);
         holder.districtTxt.setText(object.city);
@@ -87,4 +91,41 @@ public class TreeListRowAdapter extends ArrayAdapter<TreeListBean> {
         TextView districtTxt;
     }
 
+    private class ItemFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+
+            String filterString = constraint.toString().toLowerCase();
+
+            FilterResults results = new FilterResults();
+
+            final List<TreeListBean> list = data;
+
+            int count = list.size();
+            final ArrayList<TreeListBean> nlist = new ArrayList<TreeListBean>(count);
+
+            TreeListBean filteredBean;
+
+            for (int i = 0; i < count; i++) {
+                filteredBean = list.get(i);
+                if (filteredBean.namePolish.toLowerCase().contains(filterString)) {
+                    nlist.add(filteredBean);
+                }
+            }
+
+            results.values = nlist;
+            results.count = nlist.size();
+
+            return results;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint, Filter.FilterResults results) {
+            filteredData = (ArrayList<TreeListBean>) results.values;
+            notifyDataSetChanged();
+        }
+
+    }
 }
+
